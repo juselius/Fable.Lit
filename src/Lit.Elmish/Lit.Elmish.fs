@@ -51,10 +51,10 @@ module Program =
             criteria, fun model -> handler' model; handler model)
 
     /// Adds a cumulative subscription
-    let addSubscription (subscribe: 'model -> Cmd<'msg>) (program: Program<'arg, 'model, 'msg, 'view>): Program<'arg, 'model, 'msg, 'view> =
+    let addSubscription (subscribe: 'model -> Sub<'msg>) (program: Program<'arg, 'model, 'msg, 'view>): Program<'arg, 'model, 'msg, 'view> =
         program
         |> Program.mapSubscription (fun subscribe' model ->
-            Cmd.batch [
+            Sub.batch [
                 subscribe' model
                 subscribe model
             ])
@@ -64,9 +64,13 @@ module Program =
         let mutable disp: IDisposable option = None
         program
         |> addSubscription (fun model ->
-            Cmd.ofSub (fun dispatch ->
-                disp <- subscribe model dispatch |> Some
-            )
+            [
+                [ Guid.NewGuid().ToString() ],
+                (fun dispatch ->
+                    let d = subscribe model dispatch
+                    disp <- Some d
+                    d)
+            ]
         )
         |> addTerminationHandler (fun _ ->
             disp |> Option.iter (fun d -> d.Dispose()))
@@ -117,10 +121,10 @@ module LitElmishExtensions =
 
                 let mapSetState _setState = obs.SetState
 
-                let mapSubscribe subscribe model =
+                let mapSubscribe (subscribe: ('State -> Sub<'Msg>)) model =
                     match model with
-                    | Active model -> subscribe model |> Cmd.map UserMsg
-                    | Inactive -> Cmd.none
+                    | Active model -> subscribe model |> Sub.map "" UserMsg
+                    | Inactive -> Sub.Empty
 
                 let mapTermination (criteria, handler) =
                     (function Stop -> true | UserMsg msg -> criteria msg),

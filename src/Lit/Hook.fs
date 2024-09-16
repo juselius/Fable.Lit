@@ -208,6 +208,15 @@ type HookContext(host: HookContextHost) =
     member this.useEffectOnce(effect) : unit =
         this.setEffect(Effect.OnConnected effect)
 
+    member this.useContext(context: Context<'T>, ?subscribe: bool): ContextConsumer<_> =
+        let sub = subscribe |> Option.defaultValue false
+        Lit.contextConsumer(this.host, context, sub)
+
+    member this.addProvider(context: Context<'T>, ?initialValue: 'T): ContextProvider<_> =
+        match initialValue with
+        | Some init -> Lit.contextProvider(this.host, context, init)
+        | None -> Lit.contextProvider(this.host, context)
+
 [<AllowNullLiteral>]
 type IHookProvider =
     abstract hooks: HookContext
@@ -565,3 +574,19 @@ type Hook() =
     /// </remarks>
     static member inline use_scoped_css(rules: string): string =
         Hook.getContext().use_scoped_css(rules)
+
+    /// <summary>
+    /// Consume a context prviously defined with createContext() and populated by ContextProvider().
+    /// </summary>
+    /// <param name="context">Context object handle</param>
+    /// <param name="subscribe">Subscribe to changes to the context provider state</param>
+    static member inline useContext(context: Context<'T>, ?subscribe: bool) =
+        match subscribe with
+        | Some sub -> Hook.getContext().useContext(context, sub)
+        | None -> Hook.getContext().useContext(context)
+
+    static member inline addProvider(context: Context<'T>, ?initalValue: 'T) =
+        match initalValue with
+        | Some sub -> Hook.getContext().addProvider(context, sub)
+        | None -> Hook.getContext().addProvider(context)
+

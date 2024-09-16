@@ -12,22 +12,23 @@
         "docs:deploy": "npm run docs && gh-pages -d build/docs"
     },
     "dependencies": {
-        "lit": "^3.1.4",
+        "@lit/context": "^1.1.2",
+        "lit": "^3.2.0",
         "react": "^18.3.1",
         "react-dom": "^18.3.1"
     },
     "devDependencies": {
-        "@web/test-runner": "^0.18.2",
+        "@web/test-runner": "^0.19.0",
         "@web/test-runner-commands": "^0.9.0",
         "@web/test-runner-playwright": "^0.11.0",
-        "bulma": "^1.0.1",
+        "bulma": "^0.9.3",
         "fable-publish-utils": "^2.2.0",
         "gatsby-remark-vscode": "^3.3.1",
         "gh-pages": "^6.1.1",
         "nacara": "^1.8.0",
         "nacara-layout-standard": "^1.8.0",
         "shx": "^0.3.4",
-        "vite": "^5.3.3",
-        "vscode-theme-onelight": "github:akamud/vscode-theme-onelight"
+        "vite": "^5.4.5",
+        "vscode-theme-one": "github:mrred85/vscode-theme-one"
     }
 }

@@ -45,6 +45,36 @@ type CSSResult =
     abstract cssText: string
     abstract styleSheet: CSSStyleSheet
 
+/// The return type of createContext
+type Context<'T> =
+    interface end
+
+type ContextProviderArgs<'T>
+    [<ParamObject; Emit("$0")>]
+    (
+        context: Context<'T>,
+        ?initialValue: 'T
+    ) =
+    member val context: Context<'T> = jsNative with get, set
+    member val initialValue: 'T option = jsNative with get, set
+
+type ContextConsumerArgs<'T>
+    [<ParamObject; Emit("$0")>]
+    (
+        context: Context<'T>,
+        ?subscribe: bool
+    ) =
+    member val context: Context<'T> = jsNative with get, set
+    member val subscribe: bool option = jsNative with get, set
+
+[<ImportMember("@lit/context")>]
+type ContextProvider<'T>(this: obj, args: ContextProviderArgs<'T>) =
+    member  _.setValue(v: 'T): unit = jsNative
+
+[<ImportMember("@lit/context")>]
+type ContextConsumer<'T>(this: obj, args: ContextConsumerArgs<'T>) =
+    member  _.value: 'T = jsNative
+
 type LitBindings =
     /// <summary>
     /// Interprets a template literal as an HTML template that can efficiently render to and update a container.
@@ -162,6 +192,13 @@ type LitBindings =
     [<ImportMember("lit/directives/unsafe-html.js")>]
     static member unsafeHTML(html: string) : TemplateResult = jsNative
 
+    /// <summary>
+    /// Create a new Lit context object.
+    /// </summary>
+    /// <param name="contextId">Unique identifier for strict equality checks.</param>
+    [<ImportMember("@lit/context")>]
+    static member createContext<'T>(contextId: obj): Context<'T> = jsNative
+
 [<AutoOpen>]
 module LitHelpers =
     /// <summary>
@@ -249,7 +286,7 @@ type Lit() =
     /// </example>
     static member styles(styles: (string * obj) seq) =
         JsInterop.createObj styles |> Lit.styles
-        
+
     /// <summary>
     /// Generates inline styles in an efficient way for the browser to apply
     /// </summary>
@@ -270,7 +307,7 @@ type Lit() =
     /// <param name="items">A sequence of items to be rendered.</param>
     static member mapUnique (getId: 'T -> string) (template: 'T -> TemplateResult) (items: 'T seq): TemplateResult =
         LitBindings.repeat (items, getId, (fun x _ -> template x))
-    
+
     /// <summary>
     /// Give a unique id to items in a list and retrieve the current index . This can improve performance in lists that will be sorted, filtered or re-ordered.
     /// </summary>
@@ -365,6 +402,24 @@ type Lit() =
     /// Used when building custom directives. [More info](https://lit.dev/docs/templates/custom-directives/).
     static member inline directive<'Class, 'Arg>() : 'Arg -> TemplateResult =
         LitBindings.directive JsInterop.jsConstructor<'Class> :?> _
+
+    static member makeContext<'T>(contextId: string): Context<_> =
+        let ctx = JsInterop.emitJsExpr contextId "Symbol($0)"
+        LitBindings.createContext ctx
+
+    static member contextProvider<'T>(root: obj, context: Context<'T>, ?initialValue: 'T): ContextProvider<_> =
+        match initialValue with
+        | Some initial ->
+            ContextProvider(root, ContextProviderArgs(context = context, initialValue = initial))
+        | None ->
+            ContextProvider(root, ContextProviderArgs(context = context))
+
+    static member contextConsumer<'T>(root: obj, context: Context<'T>, ?subscribe: bool): ContextConsumer<_> =
+        match subscribe with
+        | Some sub when sub ->
+            ContextConsumer(root, ContextConsumerArgs(context = context, subscribe = true))
+        | _ ->
+            ContextConsumer(root, ContextConsumerArgs(context = context))
 
 [<AutoOpen>]
 module DomHelpers =

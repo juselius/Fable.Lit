@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://gitlab.com/oceanbox/Fable.Lit/compare/v1.5.0...v1.5.1) (2024-09-17)
+
+
+### Bug Fixes
+
+* force new release ([5454369](https://gitlab.com/oceanbox/Fable.Lit/commit/54543698f7a2406d57be8ec9bb28de0a679b325a))
+
 # 1.0.0 (2024-09-17)
 
 

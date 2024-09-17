@@ -587,6 +587,6 @@ type Hook() =
 
     static member inline addProvider(context: Context<'T>, ?initalValue: 'T) =
         match initalValue with
-        | Some sub -> Hook.getContext().addProvider(context, sub)
+        | Some value -> Hook.getContext().addProvider(context, value)
         | None -> Hook.getContext().addProvider(context)
 

@@ -403,7 +403,7 @@ type Lit() =
     static member inline directive<'Class, 'Arg>() : 'Arg -> TemplateResult =
         LitBindings.directive JsInterop.jsConstructor<'Class> :?> _
 
-    static member makeContext<'T>(contextId: string): Context<_> =
+    static member makeContext<'T>(contextId: string): Context<'T> =
         let ctx = JsInterop.emitJsExpr contextId "Symbol($0)"
         LitBindings.createContext ctx
 

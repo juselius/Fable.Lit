@@ -1,0 +1,8 @@
+variables:
+  PROJECT_NAME: fable.lit
+  SKIP_TESTS: "true"
+
+include:
+  - project: oceanbox/gitlab-ci
+    ref: v3
+    file: DotnetPackage.gitlab-ci.yml

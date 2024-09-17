@@ -29,14 +29,14 @@ Target.create "Bundle" (fun _ ->
     modules
     |> List.iter (fun m ->
         let src = modPath m
-        run dotnet $"publish -c Release -o \"{distPath}/{m}\" -f net8.0" src)
+        run dotnet $"publish -c Release -o \"{distPath}/{m}\"" src)
 )
 
 Target.create "BundleDebug" (fun _ ->
     modules
     |> List.iter (fun m ->
         let src = modPath m
-        run dotnet $"publish -c Debug -o \"{distPath}/{m}\" -f net8.0" src)
+        run dotnet $"publish -c Debug -o \"{distPath}/{m}\"" src)
 )
 
 Target.create "Pack" (fun _ ->

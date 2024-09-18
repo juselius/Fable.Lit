@@ -18,5 +18,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Fable.Expect" Version="1.1.1"/>
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0" />
   </ItemGroup>
 </Project>

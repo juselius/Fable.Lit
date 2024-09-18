@@ -17,6 +17,7 @@
     <ProjectReference Include="..\Lit\Lit.fsproj"/>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Fable.React" Version="7.4.1"/>
+    <PackageReference Include="Feliz" Version="2.8.0" />
+    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="8.0.0" />
   </ItemGroup>
 </Project>

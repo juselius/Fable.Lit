@@ -3,6 +3,7 @@ namespace Lit
 open System
 open Fable.Core
 open Fable.Core.JsInterop
+open Feliz
 open Fable.React
 open Browser.Types
 open Lit
@@ -24,7 +25,8 @@ type ReactDirective() =
             | Some el when this.isConnected ->
                 _domEl <- el
                 let reactEl = this.renderFn props
-                ReactDom.render(reactEl, el)
+                let root = ReactDOM.createRoot el
+                root.render(reactEl)
             | _ -> ()
         )}></div>"""
 
@@ -53,16 +55,16 @@ type React =
     /// <returns>A ReactElement</returns>
     static member inline ofLit (template: TemplateResult, ?tag: string, ?className: string) =
         let tag = defaultArg tag "div"
-        let container = Hooks.useRef Unchecked.defaultof<Element option>
+        let container = Hooks.useRef Unchecked.defaultof<HTMLElement option>
         Hooks.useEffect((fun () ->
             match container.current with
             | None -> ()
-            | Some el -> template |> Lit.render (el :?> HTMLElement)
+            | Some el -> template |> Lit.render el
         ))
-        domEl tag [
-            Props.Class (defaultArg className "")
-            Props.RefValue container
-        ] []
+        Interop.createElement tag [
+            prop.classes [ (defaultArg className "") ]
+            prop.ref container
+        ]
 
     /// Renders a Lit HTML template as a ReactElement.
     /// Must be used at the root of a React functional component (like a hook).

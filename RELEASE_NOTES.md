@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.2](https://gitlab.com/oceanbox/Fable.Lit/compare/v1.5.1...v1.5.2) (2024-09-18)
+
+
+### Bug Fixes
+
+* use Feliz and ReactDOM.createRoot() ([7855453](https://gitlab.com/oceanbox/Fable.Lit/commit/78554533a2fd9f79d1f7f7c282dfca817429c0f9))
+
 ## [1.5.1](https://gitlab.com/oceanbox/Fable.Lit/compare/v1.5.0...v1.5.1) (2024-09-17)
 
 

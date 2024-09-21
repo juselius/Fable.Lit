@@ -46,34 +46,50 @@ type CSSResult =
     abstract styleSheet: CSSStyleSheet
 
 /// The return type of createContext
-type Context<'T> =
+type ContextType<'T> =
     interface end
+
+/// Context callback function
+type ContextCallback<'T> = ContextType<'T> * (unit -> unit) -> unit
 
 type ContextProviderArgs<'T>
     [<ParamObject; Emit("$0")>]
     (
-        context: Context<'T>,
+        context: ContextType<'T>,
         ?initialValue: 'T
     ) =
-    member val context: Context<'T> = jsNative with get, set
+    member val context: ContextType<'T> = jsNative with get, set
     member val initialValue: 'T option = jsNative with get, set
 
-type ContextConsumerArgs<'T>
+type ContextConsumerOpts<'T>
     [<ParamObject; Emit("$0")>]
     (
-        context: Context<'T>,
-        ?subscribe: bool
+        context: ContextType<'T>,
+        ?subscribe: bool,
+        ?callback: ContextCallback<'T>
     ) =
-    member val context: Context<'T> = jsNative with get, set
+    member val context: ContextType<'T> = jsNative with get, set
     member val subscribe: bool option = jsNative with get, set
+    member val callback: ContextCallback<'T> option = jsNative with get, set
 
 [<ImportMember("@lit/context")>]
 type ContextProvider<'T>(this: obj, args: ContextProviderArgs<'T>) =
     member  _.setValue(v: 'T): unit = jsNative
 
 [<ImportMember("@lit/context")>]
-type ContextConsumer<'T>(this: obj, args: ContextConsumerArgs<'T>) =
+type ContextConsumer<'T>(host: obj, options: ContextConsumerOpts<'T>) =
     member  _.value: 'T = jsNative
+
+[<ImportMember("@lit/context")>]
+type ContextRoot() =
+    member  _.attach(element: HTMLElement): unit = jsNative
+    member  _.detach(element: HTMLElement): unit = jsNative
+
+[<ImportMember("@lit/context")>]
+type ContextRequestEvent() =
+    member val context: ContextType<'T> = jsNative with get
+    member val subscribe: bool option = jsNative with get
+    member val callback: ContextCallback<'T> option = jsNative with get
 
 type LitBindings =
     /// <summary>
@@ -197,7 +213,7 @@ type LitBindings =
     /// </summary>
     /// <param name="contextId">Unique identifier for strict equality checks.</param>
     [<ImportMember("@lit/context")>]
-    static member createContext<'T>(contextId: obj): Context<'T> = jsNative
+    static member createContext<'T>(contextId: obj): ContextType<'T> = jsNative
 
 [<AutoOpen>]
 module LitHelpers =
@@ -403,23 +419,36 @@ type Lit() =
     static member inline directive<'Class, 'Arg>() : 'Arg -> TemplateResult =
         LitBindings.directive JsInterop.jsConstructor<'Class> :?> _
 
-    static member makeContext<'T>(contextId: string): Context<'T> =
+    /// <summary>
+    /// Create a new Lit unique context object.
+    /// </summary>
+    /// <param name="contextId">Context identifier</param>
+    static member newContext<'T>(contextId: string): ContextType<'T> =
         let ctx = JsInterop.emitJsExpr contextId "Symbol($0)"
         LitBindings.createContext ctx
 
-    static member contextProvider<'T>(root: obj, context: Context<'T>, ?initialValue: 'T): ContextProvider<_> =
+    /// <summary>
+    /// Initialize a new non-unique Lit context object
+    /// </summary>
+    /// <param name="contextId">Context identifier</param>
+    static member newLaxContext<'T>(contextId: string): ContextType<'T> =
+        let ctx = JsInterop.emitJsExpr contextId "$0"
+        LitBindings.createContext ctx
+
+    static member contextProvider<'T>(root: obj, context: ContextType<'T>, ?initialValue: 'T): ContextProvider<_> =
         match initialValue with
         | Some initial ->
             ContextProvider(root, ContextProviderArgs(context = context, initialValue = initial))
         | None ->
             ContextProvider(root, ContextProviderArgs(context = context))
 
-    static member contextConsumer<'T>(root: obj, context: Context<'T>, ?subscribe: bool): ContextConsumer<_> =
-        match subscribe with
-        | Some sub when sub ->
-            ContextConsumer(root, ContextConsumerArgs(context = context, subscribe = true))
+    static member contextConsumer<'T>(root: obj, context: ContextType<'T>, ?subscribe: bool, ?callback: ContextCallback<'T>): ContextConsumer<_> =
+        let subscribe = subscribe |> Option.defaultValue false
+        match callback with
+        | Some f ->
+            ContextConsumer(root, ContextConsumerOpts(context = context, subscribe = subscribe, callback = f))
         | _ ->
-            ContextConsumer(root, ContextConsumerArgs(context = context))
+            ContextConsumer(root, ContextConsumerOpts(context = context, subscribe = subscribe))
 
 [<AutoOpen>]
 module DomHelpers =

@@ -208,11 +208,13 @@ type HookContext(host: HookContextHost) =
     member this.useEffectOnce(effect) : unit =
         this.setEffect(Effect.OnConnected effect)
 
-    member this.useContext(context: Context<'T>, ?subscribe: bool): ContextConsumer<_> =
-        let sub = subscribe |> Option.defaultValue false
-        Lit.contextConsumer(this.host, context, sub)
+    member this.useContext(context: ContextType<'T>, ?subscribe: bool, ?callback: ContextCallback<'T>): ContextConsumer<_> =
+        let subscribe = subscribe |> Option.defaultValue false
+        match callback with
+        | Some f -> Lit.contextConsumer(this.host, context, subscribe, f)
+        | None -> Lit.contextConsumer(this.host, context, subscribe)
 
-    member this.addProvider(context: Context<'T>, ?initialValue: 'T): ContextProvider<_> =
+    member this.addProvider(context: ContextType<'T>, ?initialValue: 'T): ContextProvider<_> =
         match initialValue with
         | Some init -> Lit.contextProvider(this.host, context, init)
         | None -> Lit.contextProvider(this.host, context)
@@ -580,12 +582,12 @@ type Hook() =
     /// </summary>
     /// <param name="context">Context object handle</param>
     /// <param name="subscribe">Subscribe to changes to the context provider state</param>
-    static member inline useContext(context: Context<'T>, ?subscribe: bool) =
+    static member inline useContext(context: ContextType<'T>, ?subscribe: bool) =
         match subscribe with
         | Some sub -> Hook.getContext().useContext(context, sub)
         | None -> Hook.getContext().useContext(context)
 
-    static member inline addProvider(context: Context<'T>, ?initalValue: 'T) =
+    static member inline addProvider(context: ContextType<'T>, ?initalValue: 'T) =
         match initalValue with
         | Some value -> Hook.getContext().addProvider(context, value)
         | None -> Hook.getContext().addProvider(context)

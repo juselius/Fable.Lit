@@ -1,5 +1,12 @@
 # Changelog
 
+# [1.6.0](https://gitlab.com/oceanbox/Fable.Lit/compare/v1.5.2...v1.6.0) (2024-09-21)
+
+
+### Features
+
+* added support for context callbacks, ContextRoots and ContextRequestEvents ([c67fd30](https://gitlab.com/oceanbox/Fable.Lit/commit/c67fd3028450fb4fb77185b4706f43a2076979c3))
+
 ## [1.5.2](https://gitlab.com/oceanbox/Fable.Lit/compare/v1.5.1...v1.5.2) (2024-09-18)
 
 

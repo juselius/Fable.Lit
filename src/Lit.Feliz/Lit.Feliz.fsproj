@@ -2,7 +2,7 @@
   <PropertyGroup>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <PackageId>Fable.Lit.Feliz</PackageId>
-    <Version>1.6.0</Version>
+    <Version>1.6.1</Version>
     <PackageVersion>1.0.0-beta-004</PackageVersion>
     <TargetFramework>netstandard2.0</TargetFramework>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>

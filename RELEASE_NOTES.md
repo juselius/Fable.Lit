@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://gitlab.com/oceanbox/Fable.Lit/compare/v1.6.0...v1.6.1) (2024-09-22)
+
+
+### Bug Fixes
+
+* fix issue when react root is created multiple times on the same element ([6cf7866](https://gitlab.com/oceanbox/Fable.Lit/commit/6cf78660ae56180a733b85df0358a50a0bc816dc))
+
 # [1.6.0](https://gitlab.com/oceanbox/Fable.Lit/compare/v1.5.2...v1.6.0) (2024-09-21)
 
 

@@ -16,6 +16,7 @@ type ReactDirective() =
     inherit Types.AsyncDirective()
 
     let mutable _domEl = Unchecked.defaultof<Element>
+    let mutable _root = Unchecked.defaultof<ReactApi.IReactRoot>
 
     member _.className = ""
     member _.renderFn = Unchecked.defaultof<obj -> ReactElement>
@@ -25,8 +26,9 @@ type ReactDirective() =
             | Some el when this.isConnected ->
                 _domEl <- el
                 let reactEl = this.renderFn props
-                let root = ReactDOM.createRoot el
-                root.render(reactEl)
+                if isNullOrUndefined _root then
+                   _root <- ReactDOM.createRoot el
+                _root.render(reactEl)
             | _ -> ()
         )}></div>"""
 

@@ -34,7 +34,8 @@ type ReactDirective() =
 
     member _.disconnected() =
         if not(isNull _domEl) then
-            ReactDom.unmountComponentAtNode(_domEl) |> ignore
+            _root.unmount()
+
 
 type React =
     /// <summary>

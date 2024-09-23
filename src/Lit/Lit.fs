@@ -73,6 +73,11 @@ type ContextConsumerOpts<'T>
     member val callback: ContextCallback<'T> option = jsNative with get, set
 
 [<ImportMember("@lit/context")>]
+type ContextRoot() =
+    member  _.attach(element: HTMLElement): unit = jsNative
+    member  _.detach(element: HTMLElement): unit = jsNative
+
+[<ImportMember("@lit/context")>]
 type ContextProvider<'T>(this: obj, args: ContextProviderArgs<'T>) =
     member  _.setValue(v: 'T): unit = jsNative
 
@@ -81,12 +86,7 @@ type ContextConsumer<'T>(host: obj, options: ContextConsumerOpts<'T>) =
     member  _.value: 'T = jsNative
 
 [<ImportMember("@lit/context")>]
-type ContextRoot() =
-    member  _.attach(element: HTMLElement): unit = jsNative
-    member  _.detach(element: HTMLElement): unit = jsNative
-
-[<ImportMember("@lit/context")>]
-type ContextRequestEvent() =
+type ContextRequestEvent<'T>() =
     member val context: ContextType<'T> = jsNative with get
     member val subscribe: bool option = jsNative with get
     member val callback: ContextCallback<'T> option = jsNative with get
@@ -435,15 +435,14 @@ type Lit() =
         let ctx = JsInterop.emitJsExpr contextId "$0"
         LitBindings.createContext ctx
 
-    static member contextProvider<'T>(root: obj, context: ContextType<'T>, ?initialValue: 'T): ContextProvider<_> =
+    static member contextProvider<'T>(root: obj, context: ContextType<'T>, initialValue: 'T option): ContextProvider<_> =
         match initialValue with
         | Some initial ->
             ContextProvider(root, ContextProviderArgs(context = context, initialValue = initial))
         | None ->
             ContextProvider(root, ContextProviderArgs(context = context))
 
-    static member contextConsumer<'T>(root: obj, context: ContextType<'T>, ?subscribe: bool, ?callback: ContextCallback<'T>): ContextConsumer<_> =
-        let subscribe = subscribe |> Option.defaultValue false
+    static member contextConsumer<'T>(root: obj, context: ContextType<'T>, subscribe: bool, callback: ContextCallback<'T> option): ContextConsumer<_> =
         match callback with
         | Some f ->
             ContextConsumer(root, ContextConsumerOpts(context = context, subscribe = subscribe, callback = f))
